@@ -8,7 +8,7 @@
 ;;; Last Modified By - Tim Bradshaw (tfb at lostwithiel)
 ;;; Update Count     - 10
 ;;; Status	     - Unknown
-;;; 
+;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;; Conduit packages, and package cloning
@@ -42,18 +42,18 @@
 
 ;;; Load HP if we can find it
 ;;;
-                             
+
 (defun hp-alias-map (p)
   (declare (ignorable p))
   #+org.tfeb.hax.hierarchical-packages
   (gethash p org.tfeb.hax.hierarchical-packages:*per-package-alias-table*)
   '())
-    
+
 (defun (setf hp-alias-map) (new p)
   ;; This one should never be called if HP is not loaded.
   (declare (ignorable new p))
   #+org.tfeb.hax.hierarchical-packages
-  (setf 
+  (setf
    (gethash p org.tfeb.hax.hierarchical-packages:*per-package-alias-table*)
    new)
   #-org.tfeb.hax.hierarchical-packages
@@ -77,7 +77,7 @@
   ;; Second value is the package named, if it exists.
   ;; maybe this should not use KEYWORD but our own secret package.
   (etypecase package/name
-    (package (values (intern (package-name package/name) 
+    (package (values (intern (package-name package/name)
 			     (find-package :keyword))
 		     package/name))
     ((or string symbol)
@@ -94,7 +94,7 @@
   (let ((pack (canonicalise-package-name pack))
 	(conduit (canonicalise-package-name conduit)))
     (let ((found (assoc pack *package-conduits*)))
-      (if found 
+      (if found
 	  (pushnew conduit (cdr found))
 	  (push (list pack conduit) *package-conduits*)))
     (let ((found (assoc conduit *conduit-packages*)))
@@ -135,8 +135,8 @@ to make them consistent"
   (dolist (pd *package-conduits* (values))
     (recompute-conduits-for (car pd))))
 
-		       
-(defun make-package-conduit-package (package/name &key 
+
+(defun make-package-conduit-package (package/name &key
 						  extends
 						  extends/including
 						  extends/excluding)
@@ -160,12 +160,12 @@ to make them consistent"
 	       ((:inherited)
 		(error "Symbol ~S not directly present in ~S" s p)))))
 	 (import-symbol (s pack)
-	   (cl:import (if (eq s 'nil) 
+	   (cl:import (if (eq s 'nil)
 			  '(nil)
 			  s)
 		      pack))
 	 (export-symbol (s pack)
-	   (cl:export (if (eq s 'nil) 
+	   (cl:export (if (eq s 'nil)
 			  '(nil)
 			  s)
 		      pack)))
@@ -227,7 +227,7 @@ to make them consistent"
           :do (import interned-symbols to)
           :when shadows
           :do (shadow shadows to)
-          :when exports 
+          :when exports
           :do(export exports to)
           :when used
           :do (use-package used to))
@@ -246,7 +246,7 @@ to make them consistent"
     to))
 
 ;;;; Define the basic package operations we need to take over.
-;;; 
+;;;
 ;;; !!! Others may need to be added here.  I think that UNINTERN is OK,
 ;;; but I'm not sure about others.
 
@@ -264,7 +264,7 @@ to make them consistent"
   "Define a package.  See CL:DEFPACKAGE for tha basics.
 In addition, this version of DEFPACKAGE can define a `conduit package':
 that you can use as a conduit to extend existing packages.
-This works by importing symbols from the existing packages and 
+This works by importing symbols from the existing packages and
 then reexporting them. The syntax is as DEFPACKAGE, wiht the addition
 of three new clauses:
 	(:EXTEND package) takes package and reexports all its symbols;
@@ -283,7 +283,7 @@ This version of DEFPACKAGE also support `cloning' packages: making another
 package which is `just like' an existing package. This means that all the
 internal, exported and shadowing symbols in the clone will be the same as
 those in the cloned package, but any additional things defined by DEFPACKAGE
-will also take effect.  This allows you to essentially make a copy of 
+will also take effect.  This allows you to essentially make a copy of
 a package which you can then use to define new functionality without
 interning a lot of things in the original package.  Cloning is a static
 operation - packages do not know who their clones are, and no attempt is made
@@ -313,8 +313,8 @@ As with extending you probably want to specify (:USE) when cloning."
                             (typep (second e)
                                    '(or symbol string))
                             (null (cddr e)))
-               :do 
-               (error 
+               :do
+               (error
                 "Package aliases should be list of (STRING STRING)")
                :when (assoc (string (first e)) package-aliases
                             :test #'string=)
@@ -367,9 +367,9 @@ As with extending you probably want to specify (:USE) when cloning."
   (let ((name (canonicalise-package-name pack/name)))
     (let ((conduits (cdr (assoc name *package-conduits*))))
       (when conduits
-	(error "Trying to delete ~S, but it has conduits ~S" 
+	(error "Trying to delete ~S, but it has conduits ~S"
 	       (find-package pack/name) (mapcar #'find-package conduits))))
-    (prog1 
+    (prog1
         (progn
           (delete-hp-alias-map (find-package pack/name))
           (cl:delete-package pack/name))
@@ -380,7 +380,7 @@ As with extending you probably want to specify (:USE) when cloning."
 	    *package-conduits* (delete name *package-conduits* :key #'car)))))
 
 (defun rename-package (pack/name new-name &optional (nicknames '()))
-  (prog1 
+  (prog1
     (cl:rename-package pack/name new-name nicknames)
     (let ((name (canonicalise-package-name pack/name))
 	  (new-name (canonicalise-package-name new-name)))
