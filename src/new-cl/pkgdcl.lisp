@@ -12,7 +12,8 @@
               #+(or ccl openmcl) :ccl
               #+lispworks        :stream
               #+sbcl             :sb-gray
-              #-(or abcl allegro cmu scl clisp ecl ccl openmcl lispworks sbcl)
+              #+torcl            :torcl-gray-streams
+              #-(or abcl allegro cmu scl clisp ecl ccl openmcl lispworks sbcl torcl)
               (cl:error "Your CL implementation isn't supported."))
              (#2=gray-streams-symbols
               '(#:fundamental-stream #:fundamental-input-stream
